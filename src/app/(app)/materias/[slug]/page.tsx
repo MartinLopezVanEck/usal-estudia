@@ -5,15 +5,47 @@ import { TIPOS_MATERIAL, type TipoMaterial } from "@/lib/constants";
 import { Migas } from "@/components/migas";
 import { COLUMNAS_ARCHIVO, ListaArchivos, type ArchivoVisible } from "@/components/lista-archivos";
 
+const ORDEN_TIPOS = Object.keys(TIPOS_MATERIAL);
+
+/** Los archivos sin año van siempre al final. */
+function porAnio(a: ArchivoVisible, b: ArchivoVisible, sentido: 1 | -1) {
+  if (a.anio_cursada === b.anio_cursada) return 0;
+  if (a.anio_cursada === null) return 1;
+  if (b.anio_cursada === null) return -1;
+  return (a.anio_cursada - b.anio_cursada) * sentido;
+}
+
+const ORDENES = {
+  recientes: {
+    etiqueta: "Más recientes",
+    comparar: (a: ArchivoVisible, b: ArchivoVisible) =>
+      porAnio(a, b, -1) || b.created_at.localeCompare(a.created_at),
+  },
+  antiguos: {
+    etiqueta: "Más antiguos",
+    comparar: (a: ArchivoVisible, b: ArchivoVisible) =>
+      porAnio(a, b, 1) || a.titulo.localeCompare(b.titulo),
+  },
+  tipo: {
+    etiqueta: "Por tipo",
+    comparar: (a: ArchivoVisible, b: ArchivoVisible) =>
+      ORDEN_TIPOS.indexOf(a.tipo) - ORDEN_TIPOS.indexOf(b.tipo) ||
+      porAnio(a, b, -1) ||
+      a.titulo.localeCompare(b.titulo),
+  },
+};
+type Orden = keyof typeof ORDENES;
+
 export default async function MateriaPage({
   params,
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ carrera?: string; profesor?: string; tipo?: string }>;
+  searchParams: Promise<{ carrera?: string; profesor?: string; tipo?: string; orden?: string }>;
 }) {
   const { slug } = await params;
-  const { carrera: carreraSlug, profesor, tipo } = await searchParams;
+  const { carrera: carreraSlug, profesor, tipo, orden: ordenParam } = await searchParams;
+  const orden: Orden = ordenParam && ordenParam in ORDENES ? (ordenParam as Orden) : "recientes";
   const supabase = await createClient();
 
   const { data: materia } = await supabase
@@ -34,10 +66,7 @@ export default async function MateriaPage({
       .from("archivos_visibles")
       .select(COLUMNAS_ARCHIVO)
       .eq("materia_id", materia.id)
-      .eq("estado", "aprobado")
-      .order("tipo")
-      .order("anio_cursada", { ascending: false, nullsFirst: false })
-      .order("titulo"),
+      .eq("estado", "aprobado"),
   ]);
 
   const archivos = (archivosData ?? []) as ArchivoVisible[];
@@ -48,11 +77,13 @@ export default async function MateriaPage({
   const conteo = (profId: string | null) => archivos.filter((a) => a.profesor_id === profId).length;
   const sinProfesor = conteo(null);
 
-  const filtrados = archivos.filter(
-    (a) =>
-      (!profesor || (profesor === "general" ? a.profesor_id === null : a.profesor_id === profesor)) &&
-      (!tipo || a.tipo === tipo),
-  );
+  const filtrados = archivos
+    .filter(
+      (a) =>
+        (!profesor || (profesor === "general" ? a.profesor_id === null : a.profesor_id === profesor)) &&
+        (!tipo || a.tipo === tipo),
+    )
+    .sort(ORDENES[orden].comparar);
   const tiposPresentes = [...new Set(archivos.map((a) => a.tipo))];
 
   // Ruta de migas: si venimos de una carrera la usamos, si no la primera del plan.
@@ -64,7 +95,7 @@ export default async function MateriaPage({
 
   const href = (cambios: Record<string, string | undefined>) => {
     const q = new URLSearchParams();
-    const valores = { carrera: carreraSlug, profesor, tipo, ...cambios };
+    const valores = { carrera: carreraSlug, profesor, tipo, orden: ordenParam, ...cambios };
     for (const [k, v] of Object.entries(valores)) if (v) q.set(k, v);
     const s = q.toString();
     return `/materias/${slug}${s ? `?${s}` : ""}`;
@@ -117,6 +148,18 @@ export default async function MateriaPage({
         </aside>
 
         <section>
+          <div className="mb-3 flex flex-wrap items-center gap-x-1 gap-y-2 text-sm">
+            <span className="mr-1 text-tenue">Ordenar:</span>
+            {(Object.entries(ORDENES) as [Orden, (typeof ORDENES)[Orden]][]).map(([clave, { etiqueta }]) => (
+              <Link
+                key={clave}
+                href={href({ orden: clave === "recientes" ? undefined : clave })}
+                className={`rounded-lg px-2.5 py-1 ${orden === clave ? "bg-acento/10 font-medium text-acento" : "hover:bg-borde/50"}`}
+              >
+                {etiqueta}
+              </Link>
+            ))}
+          </div>
           {tiposPresentes.length > 1 && (
             <div className="mb-3 flex flex-wrap gap-2">
               <Link
