@@ -1,26 +1,71 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --fondo: #f6f7f9;
+  --superficie: #ffffff;
+  --texto: #15181d;
+  --tenue: #5f6774;
+  --borde: #e2e5ea;
+  --acento: #1f4fa8;
+  --acento-texto: #ffffff;
+  --peligro: #c2352b;
+  --exito: #1f7a4d;
+  --aviso: #a86200;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --fondo: #0f1115;
+    --superficie: #171a20;
+    --texto: #e7e9ee;
+    --tenue: #9aa2af;
+    --borde: #2a2f38;
+    --acento: #6e9bf0;
+    --acento-texto: #0f1115;
+    --peligro: #f07167;
+    --exito: #5cc28f;
+    --aviso: #e7a64a;
   }
 }
 
+@theme inline {
+  --color-fondo: var(--fondo);
+  --color-superficie: var(--superficie);
+  --color-texto: var(--texto);
+  --color-tenue: var(--tenue);
+  --color-borde: var(--borde);
+  --color-acento: var(--acento);
+  --color-acento-texto: var(--acento-texto);
+  --color-peligro: var(--peligro);
+  --color-exito: var(--exito);
+  --color-aviso: var(--aviso);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--fondo);
+  color: var(--texto);
+}
+
+@utility input {
+  @apply w-full rounded-lg border border-borde bg-superficie px-3 py-2 text-sm outline-none focus:border-acento;
+}
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-60;
+}
+@utility btn-primario {
+  @apply btn bg-acento text-acento-texto hover:opacity-90;
+}
+@utility btn-secundario {
+  @apply btn border border-borde bg-superficie hover:bg-borde/50;
+}
+@utility btn-peligro {
+  @apply btn border border-peligro/40 text-peligro hover:bg-peligro/10;
+}
+@utility tarjeta {
+  @apply rounded-xl border border-borde bg-superficie;
+}
+@utility etiqueta {
+  @apply mb-1 block text-sm font-medium;
 }
