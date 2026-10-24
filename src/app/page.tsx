@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { Donacion } from "@/components/donacion";
+import { BotonTema } from "@/components/boton-tema";
 
 async function contar() {
   const db = createAdminClient();
@@ -72,9 +73,12 @@ export default async function PresentacionPage() {
       <header className="border-b border-borde bg-superficie">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <span className="text-lg font-semibold">Usal Estudia</span>
-          <Link href={user ? "/carreras" : "/login"} className="text-sm font-medium text-acento hover:underline">
-            {user ? "Entrar" : "Ingresar"}
-          </Link>
+          <div className="flex items-center gap-2">
+            <BotonTema />
+            <Link href={user ? "/carreras" : "/login"} className="text-sm font-medium text-acento hover:underline">
+              {user ? "Entrar" : "Ingresar"}
+            </Link>
+          </div>
         </div>
       </header>
 

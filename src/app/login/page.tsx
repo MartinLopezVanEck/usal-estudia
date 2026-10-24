@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BotonGoogle } from "./boton-google";
+import { BotonTema } from "@/components/boton-tema";
 
 const ERRORES: Record<string, string> = {
   dominio: "Solo se puede ingresar con una cuenta @usal.edu.ar o una cuenta autorizada por un admin.",
@@ -14,7 +15,10 @@ export default async function LoginPage({
   const { error, next } = await searchParams;
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-4">
+    <main className="relative flex min-h-screen items-center justify-center px-4">
+      <div className="absolute right-4 top-4">
+        <BotonTema />
+      </div>
       <div className="w-full max-w-sm rounded-2xl border border-borde bg-superficie p-8 text-center shadow-sm">
         <h1 className="text-2xl font-semibold">Usal Estudia</h1>
         <p className="mt-2 text-sm text-tenue">

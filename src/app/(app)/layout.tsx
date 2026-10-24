@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { requireUser } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { Buscador } from "@/components/buscador";
+import { BotonTema } from "@/components/boton-tema";
 
 async function contarPendientes() {
   const db = createAdminClient();
@@ -52,6 +53,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                 )}
               </Link>
             )}
+            <BotonTema />
             <form action="/auth/salir" method="post">
               <button
                 className="rounded-lg px-3 py-1.5 text-tenue hover:bg-borde/50"

@@ -10,9 +10,15 @@ export const metadata: Metadata = {
   description: "Parciales, apuntes y guías de la USAL compartidos por alumnos.",
 };
 
+// Aplica el tema guardado (o el del sistema) antes de dibujar la página, para que no parpadee.
+const SCRIPT_TEMA = `(function(){try{var t=localStorage.getItem("tema");if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=t}catch(e){}})()`;
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_TEMA }} />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
         {children}
       </body>

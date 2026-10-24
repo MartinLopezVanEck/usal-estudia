@@ -11,10 +11,13 @@
   --peligro: #c2352b;
   --exito: #1f7a4d;
   --aviso: #a86200;
+  color-scheme: light;
 }
 
+/* El tema elegido se guarda en data-theme (lo pone un script en el layout).
+   Sin JavaScript, se sigue el modo del sistema. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --fondo: #0f1115;
     --superficie: #171a20;
     --texto: #e7e9ee;
@@ -25,8 +28,26 @@
     --peligro: #f07167;
     --exito: #5cc28f;
     --aviso: #e7a64a;
+    color-scheme: dark;
   }
 }
+
+:root[data-theme="dark"] {
+  --fondo: #0f1115;
+  --superficie: #171a20;
+  --texto: #e7e9ee;
+  --tenue: #9aa2af;
+  --borde: #2a2f38;
+  --acento: #6e9bf0;
+  --acento-texto: #0f1115;
+  --peligro: #f07167;
+  --exito: #5cc28f;
+  --aviso: #e7a64a;
+  color-scheme: dark;
+}
+
+/* dark: de Tailwind sigue al tema elegido, no solo al del sistema */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @theme inline {
   --color-fondo: var(--fondo);
