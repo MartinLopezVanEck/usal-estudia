@@ -34,7 +34,7 @@ export async function requireUser() {
 
 export async function requireAdmin() {
   const perfil = await requireUser();
-  if (perfil.rol !== "admin") redirect("/");
+  if (perfil.rol !== "admin") redirect("/carreras");
   return perfil;
 }
 

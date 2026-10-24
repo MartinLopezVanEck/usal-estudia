@@ -33,7 +33,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             </Suspense>
           </div>
           <nav className="ml-auto flex items-center gap-1 text-sm">
-            <Link href="/" className="rounded-lg px-3 py-1.5 hover:bg-borde/50">
+            <Link href="/carreras" className="rounded-lg px-3 py-1.5 hover:bg-borde/50">
               Carreras
             </Link>
             <Link href="/subir" className="btn-primario px-3 py-1.5">

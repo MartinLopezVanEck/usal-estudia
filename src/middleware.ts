@@ -30,13 +30,21 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
-  const esPublica = RUTAS_PUBLICAS.some((r) => pathname.startsWith(r));
+  // "/" es la presentación pública; el resto de RUTAS_PUBLICAS incluye sus subrutas.
+  const esPublica = pathname === "/" || RUTAS_PUBLICAS.some((r) => pathname.startsWith(r));
 
   if (!user && !esPublica) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.search = "";
-    if (pathname !== "/") url.searchParams.set("next", pathname + request.nextUrl.search);
+    url.searchParams.set("next", pathname + request.nextUrl.search);
+    return NextResponse.redirect(url);
+  }
+
+  if (user && pathname === "/login") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/carreras";
+    url.search = "";
     return NextResponse.redirect(url);
   }
 

@@ -19,7 +19,7 @@ export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
   const next = searchParams.get("next");
-  const destino = next?.startsWith("/") && !next.startsWith("//") ? next : "/";
+  const destino = next?.startsWith("/") && !next.startsWith("//") ? next : "/carreras";
 
   // Si el trigger de la base rechazó el mail, Supabase vuelve con un error.
   const errorDesc = searchParams.get("error_description") ?? "";
