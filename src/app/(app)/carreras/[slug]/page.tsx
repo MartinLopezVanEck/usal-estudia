@@ -11,22 +11,18 @@ import { FiltroMaterias, type AnioPlan } from "@/components/filtro-materias";
 const ORDEN_CUATRI: Cuatrimestre[] = ["anual", "primero", "segundo"];
 
 export default async function CarreraPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const supabase = await createClient();
+  const [{ slug }, supabase] = await Promise.all([params, createClient()]);
 
-  const { data: carrera } = await supabase
-    .from("carreras")
-    .select("id, nombre")
-    .eq("slug", slug)
-    .eq("estado", "aprobado")
-    .single();
+  // La carrera y su plan en paralelo (el plan se filtra por el slug de la carrera).
+  const [{ data: carrera }, { data: filas }] = await Promise.all([
+    supabase.from("carreras").select("id, nombre").eq("slug", slug).eq("estado", "aprobado").maybeSingle(),
+    supabase
+      .from("plan_materias")
+      .select("anio, cuatrimestre, materias!inner(id, nombre, slug, estado), carreras!inner(slug)")
+      .eq("carreras.slug", slug)
+      .eq("materias.estado", "aprobado"),
+  ]);
   if (!carrera) notFound();
-
-  const { data: filas } = await supabase
-    .from("plan_materias")
-    .select("anio, cuatrimestre, materias!inner(id, nombre, slug, estado)")
-    .eq("carrera_id", carrera.id)
-    .eq("materias.estado", "aprobado");
 
   const porAnio = new Map<number, Map<Cuatrimestre, { nombre: string; slug: string }[]>>();
   for (const fila of filas ?? []) {

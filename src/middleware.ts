@@ -25,9 +25,10 @@ export async function middleware(request: NextRequest) {
     },
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // getClaims verifica el token localmente (sin ir a Supabase en cada clic) y lo
+  // renueva si venció. Con claves simétricas viejas, consulta al servidor como antes.
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims?.sub;
 
   const { pathname } = request.nextUrl;
   // "/" es la presentación pública; el resto de RUTAS_PUBLICAS incluye sus subrutas.

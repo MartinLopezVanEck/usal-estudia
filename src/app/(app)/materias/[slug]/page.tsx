@@ -18,27 +18,27 @@ export default async function MateriaPage({
   params: Promise<{ slug: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const { slug } = await params;
-  const filtros = leerFiltros(await searchParams);
+  const [{ slug }, parametros, supabase, almacen] = await Promise.all([params, searchParams, createClient(), cookies()]);
+  const filtros = leerFiltros(parametros);
   const orden = ordenValido(filtros.orden);
-  const supabase = await createClient();
 
-  const { data: materia } = await supabase
-    .from("materias")
-    .select("id, nombre, plan_materias(anio, carreras(nombre, slug, estado))")
-    .eq("slug", slug)
-    .eq("estado", "aprobado")
-    .single();
-  if (!materia) notFound();
-
-  const [{ data: catedras }, { data: archivosData }] = await Promise.all([
+  // Todo en paralelo: las cátedras y los archivos se filtran por el slug de la materia,
+  // así no hay que esperar a tener su id.
+  const [{ data: materia }, { data: catedras }, { data: archivosData }] = await Promise.all([
+    supabase
+      .from("materias")
+      .select("id, nombre, plan_materias(anio, carreras(nombre, slug, estado))")
+      .eq("slug", slug)
+      .eq("estado", "aprobado")
+      .maybeSingle(),
     supabase
       .from("catedras")
-      .select("profesores!inner(id, nombre, estado)")
-      .eq("materia_id", materia.id)
+      .select("profesores!inner(id, nombre, estado), materias!inner(slug)")
+      .eq("materias.slug", slug)
       .eq("profesores.estado", "aprobado"),
-    supabase.from("archivos_visibles").select(COLUMNAS_ARCHIVO).eq("materia_id", materia.id).eq("estado", "aprobado"),
+    supabase.from("archivos_visibles").select(COLUMNAS_ARCHIVO).eq("materia_slug", slug).eq("estado", "aprobado"),
   ]);
+  if (!materia) notFound();
 
   const archivos = (archivosData ?? []) as ArchivoVisible[];
   const profesores = (catedras ?? [])
@@ -56,7 +56,7 @@ export default async function MateriaPage({
 
   // Ruta de migas: la carrera desde la que venís, si no la última que abriste, si no la primera del plan.
   const planes = (materia.plan_materias ?? []) as unknown as Plan[];
-  const carreraGuardada = (await cookies()).get(COOKIE_CARRERA)?.value;
+  const carreraGuardada = almacen.get(COOKIE_CARRERA)?.value;
   const plan =
     planes.find((p) => p.carreras?.slug === filtros.carrera) ??
     planes.find((p) => p.carreras?.slug === carreraGuardada) ??

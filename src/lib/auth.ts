@@ -13,15 +13,16 @@ export type Perfil = {
 
 export const obtenerPerfil = cache(async (): Promise<Perfil | null> => {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
+  // getClaims lee el usuario del token (ya verificado y renovado por el middleware)
+  // sin una consulta extra a Supabase.
+  const { data: sesion } = await supabase.auth.getClaims();
+  const id = sesion?.claims?.sub;
+  if (!id) return null;
 
   const { data } = await supabase
     .from("profiles")
     .select("id, email, nombre, avatar_url, rol")
-    .eq("id", user.id)
+    .eq("id", id)
     .single();
   return data;
 });

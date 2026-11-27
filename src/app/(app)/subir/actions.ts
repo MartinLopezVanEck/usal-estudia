@@ -1,7 +1,8 @@
 "use server";
 
 import { randomUUID } from "node:crypto";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { TAG_CATALOGO } from "@/lib/cache";
 import { limiteSubidaBytes, requireUser } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { borrarDeR2, tamanoEnR2, urlDeSubida } from "@/lib/r2";
@@ -144,6 +145,7 @@ export async function confirmarSubida(d: DatosSubida): Promise<Resultado<{ id: s
     if (error) throw new Error(error.message);
 
     revalidatePath("/", "layout");
+    revalidateTag(TAG_CATALOGO);
     return { ok: true, data: { id: data.id } };
   } catch (e) {
     return fallar(e instanceof Error ? e.message : "Error inesperado.");

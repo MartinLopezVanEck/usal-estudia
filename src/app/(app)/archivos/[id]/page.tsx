@@ -1,9 +1,19 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
+import { preconnect } from "react-dom";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { urlDeDescarga } from "@/lib/r2";
 import { obtenerPerfil } from "@/lib/auth";
-import { COOKIE_CARRERA, TIPOS_MATERIAL, extension, formatearTamano, tipoVistaPrevia } from "@/lib/constants";
+import {
+  COOKIE_CARRERA,
+  TIPOS_MATERIAL,
+  contentTypeVistaPrevia,
+  extension,
+  formatearTamano,
+  tipoVistaPrevia,
+} from "@/lib/constants";
 import { ORDENES, consulta, filtrarYOrdenar, leerFiltros, type FiltrosMateria } from "@/lib/archivos-materia";
 import { Migas } from "@/components/migas";
 import { RegistrarVisita } from "@/components/recientes";
@@ -45,17 +55,21 @@ export default async function ArchivoPage({
   params: Promise<{ id: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const { id } = await params;
-  const filtros = leerFiltros(await searchParams);
-  const supabase = await createClient();
-  const perfil = await obtenerPerfil();
+  const [{ id }, parametros, supabase] = await Promise.all([params, searchParams, createClient()]);
+  const filtros = leerFiltros(parametros);
 
-  const { data } = await supabase.from("archivos_visibles").select(COLUMNAS_ARCHIVO).eq("id", id).maybeSingle();
+  // El perfil y el archivo no dependen uno del otro: se piden juntos.
+  const [perfil, { data }] = await Promise.all([
+    obtenerPerfil(),
+    supabase.from("archivos_visibles").select(COLUMNAS_ARCHIVO).eq("id", id).maybeSingle(),
+  ]);
   if (!data) notFound();
   const a = data as ArchivoVisible;
 
-  const [{ data: hermanosData }, { data: materia }, almacen] = await Promise.all([
+  const [{ data: hermanosData }, { data: clavesData }, { data: materia }, almacen] = await Promise.all([
     supabase.from("archivos_visibles").select(COLUMNAS_ARCHIVO).eq("materia_id", a.materia_id).eq("estado", "aprobado"),
+    // Claves de R2 de la materia, para firmar las URLs acá mismo (solo se firman archivos que la vista dejó ver).
+    createAdminClient().from("archivos").select("id, storage_key").eq("materia_id", a.materia_id),
     supabase
       .from("materias")
       .select("plan_materias(anio, carreras(nombre, slug, estado))")
@@ -95,8 +109,29 @@ export default async function ArchivoPage({
     .slice(0, 4);
 
   const vista = tipoVistaPrevia(a.nombre_original);
-  const urlVer = `/api/archivos/${a.id}?ver=1`;
   const esAdmin = perfil?.rol === "admin";
+
+  // URLs firmadas directo a R2: el visor no pasa por /api ni por el middleware.
+  // Firmar es local (no consulta a nadie), así que es instantáneo.
+  const claves = new Map((clavesData ?? []).map((c) => [c.id as string, c.storage_key as string]));
+  const firmar = (x: ArchivoVisible, inline: boolean) => {
+    const clave = claves.get(x.id);
+    if (!clave) return Promise.resolve(null);
+    return urlDeDescarga(clave, x.nombre_original, {
+      inline,
+      contentType: inline ? contentTypeVistaPrevia(x.nombre_original) : null,
+    });
+  };
+  const proximoEsPdf = proximo && tipoVistaPrevia(proximo.nombre_original) === "pdf";
+  const [firmadaVer, firmadaBajar, firmadaSiguiente] = await Promise.all([
+    vista ? firmar(a, true) : null,
+    firmar(a, false),
+    proximoEsPdf ? firmar(proximo, true) : null,
+  ]);
+  const urlVer = firmadaVer ?? `/api/archivos/${a.id}?ver=1`;
+  const urlBajar = firmadaBajar ?? `/api/archivos/${a.id}`;
+  // Abre la conexión con R2 mientras el navegador todavía está armando la página.
+  if (firmadaVer) preconnect(new URL(firmadaVer).origin);
 
   return (
     <div>
@@ -162,7 +197,7 @@ export default async function ArchivoPage({
           )}
 
           <div className="mt-5 flex flex-wrap items-start gap-2">
-            <a href={`/api/archivos/${a.id}`} className="btn-primario">
+            <a href={urlBajar} className="btn-primario">
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                 <path d="M12 3v12M7 10l5 5 5-5M5 21h14" />
               </svg>
@@ -187,7 +222,9 @@ export default async function ArchivoPage({
           )}
 
           <div className="mt-6">
-            {vista === "pdf" && <VisorPdf url={urlVer} titulo={a.titulo} />}
+            {vista === "pdf" && (
+              <VisorPdf key={a.id} url={urlVer} titulo={a.titulo} siguiente={firmadaSiguiente ?? undefined} />
+            )}
             {vista === "imagen" && (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={urlVer} alt={a.titulo} className="tarjeta mx-auto max-h-[80vh] max-w-full" />

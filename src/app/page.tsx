@@ -1,24 +1,10 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { conteosPortada } from "@/lib/cache";
 import { Donacion } from "@/components/donacion";
 import { BotonTema } from "@/components/boton-tema";
 import { Logo } from "@/components/logo";
 import { Contador } from "@/components/contador";
-
-async function contar() {
-  const db = createAdminClient();
-  const [archivos, materias, profesores] = await Promise.all(
-    (["archivos", "materias", "profesores"] as const).map((t) =>
-      db.from(t).select("id", { count: "exact", head: true }).eq("estado", "aprobado"),
-    ),
-  );
-  return {
-    archivos: archivos.count ?? 0,
-    materias: materias.count ?? 0,
-    profesores: profesores.count ?? 0,
-  };
-}
 
 const PASOS = [
   {
@@ -61,12 +47,8 @@ const NO = [
 
 export default async function PresentacionPage() {
   const supabase = await createClient();
-  const [
-    {
-      data: { user },
-    },
-    numeros,
-  ] = await Promise.all([supabase.auth.getUser(), contar()]);
+  const [{ data: sesion }, numeros] = await Promise.all([supabase.auth.getClaims(), conteosPortada()]);
+  const user = sesion?.claims?.sub;
 
   const destino = user ? "/carreras" : "/login";
 

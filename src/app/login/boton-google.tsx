@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 
 async function ingresar(next: string | undefined, soloUsal: boolean) {
+  // El cliente de Supabase pesa ~70 kB: se carga recién al apretar el botón.
+  const { createClient } = await import("@/lib/supabase/client");
   const supabase = createClient();
   const callback = new URL("/auth/callback", window.location.origin);
   if (next?.startsWith("/")) callback.searchParams.set("next", next);

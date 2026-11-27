@@ -1,11 +1,12 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { borrarDeR2 } from "@/lib/r2";
 import { slugify } from "@/lib/slug";
+import { TAG_CATALOGO } from "@/lib/cache";
 import { CUATRIMESTRES, TIPOS_MATERIAL, type Cuatrimestre } from "@/lib/constants";
 import {
   asegurarCatedra,
@@ -30,6 +31,7 @@ function entidad(fd: FormData): Entidad {
 
 function refrescar() {
   revalidatePath("/", "layout");
+  revalidateTag(TAG_CATALOGO);
 }
 
 // ---------------------------------------------------------------------------

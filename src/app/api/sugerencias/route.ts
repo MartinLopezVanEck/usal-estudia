@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { materiasAprobadas } from "@/lib/cache";
 import { coincide, palabras } from "@/lib/busqueda";
 import { TIPOS_MATERIAL, type TipoMaterial } from "@/lib/constants";
 
@@ -10,10 +11,8 @@ export async function GET(request: Request) {
   if (!buscadas.length) return NextResponse.json({ materias: [], archivos: [] });
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  const { data: sesion } = await supabase.auth.getClaims();
+  if (!sesion?.claims?.sub) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
   let consulta = supabase
     .from("archivos_visibles")
@@ -21,14 +20,14 @@ export async function GET(request: Request) {
     .eq("estado", "aprobado");
   for (const p of buscadas) consulta = consulta.ilike("busqueda", `%${p}%`);
 
-  const [{ data: materias }, { data: archivos }] = await Promise.all([
-    supabase.from("materias").select("nombre, slug").eq("estado", "aprobado").order("nombre"),
+  const [materias, { data: archivos }] = await Promise.all([
+    materiasAprobadas(),
     consulta.order("created_at", { ascending: false }).limit(6),
   ]);
 
   return NextResponse.json(
     {
-      materias: (materias ?? []).filter((m) => coincide(m.nombre, buscadas)).slice(0, 5),
+      materias: materias.filter((m) => coincide(m.nombre, buscadas)).slice(0, 5),
       archivos: (archivos ?? []).map((a) => ({
         id: a.id,
         titulo: a.titulo,

@@ -33,7 +33,15 @@ export function urlDeSubida(key: string, contentType: string, tamano: number) {
   );
 }
 
-/** URL firmada de descarga. `inline` la muestra en el navegador (vista previa). */
+const HORA = 60 * 60 * 1000;
+
+/**
+ * URL firmada de descarga. `inline` la muestra en el navegador (vista previa).
+ *
+ * La firma usa el comienzo de la hora actual, así la URL es la misma durante esa
+ * hora y el navegador reutiliza el archivo que ya bajó (Cache-Control). Vale 2 h
+ * desde ese momento, o sea que siempre le queda al menos una hora de vida.
+ */
 export function urlDeDescarga(
   key: string,
   nombre: string,
@@ -47,8 +55,9 @@ export function urlDeDescarga(
       Key: key,
       ResponseContentDisposition: `${disposicion}; filename*=UTF-8''${encodeURIComponent(nombre)}`,
       ResponseContentType: opciones.contentType ?? undefined,
+      ResponseCacheControl: "private, max-age=3600",
     }),
-    { expiresIn: 60 * 10 },
+    { expiresIn: 2 * 60 * 60, signingDate: new Date(Math.floor(Date.now() / HORA) * HORA) },
   );
 }
 
