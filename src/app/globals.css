@@ -11,6 +11,7 @@
   --acento: #008357;
   --acento-fuerte: #08473b;
   --acento-texto: #ffffff;
+  --brillo: #3fd39a;
   --peligro: #d42d33;
   --exito: #16794a;
   --aviso: #b45f06;
@@ -21,15 +22,16 @@
    Sin JavaScript, se sigue el modo del sistema. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --fondo: #0a1411;
-    --superficie: #101c18;
-    --suave: #172621;
+    --fondo: #08110e;
+    --superficie: #0f1b17;
+    --suave: #162520;
     --texto: #e4eeea;
     --tenue: #8fa39c;
-    --borde: #20302a;
+    --borde: #1f2f29;
     --acento: #2fbf86;
     --acento-fuerte: #6fdcae;
     --acento-texto: #04140e;
+    --brillo: #2fbf86;
     --peligro: #f2676b;
     --exito: #4fc58a;
     --aviso: #e9a84c;
@@ -38,15 +40,16 @@
 }
 
 :root[data-theme="dark"] {
-  --fondo: #0a1411;
-  --superficie: #101c18;
-  --suave: #172621;
+  --fondo: #08110e;
+  --superficie: #0f1b17;
+  --suave: #162520;
   --texto: #e4eeea;
   --tenue: #8fa39c;
-  --borde: #20302a;
+  --borde: #1f2f29;
   --acento: #2fbf86;
   --acento-fuerte: #6fdcae;
   --acento-texto: #04140e;
+  --brillo: #2fbf86;
   --peligro: #f2676b;
   --exito: #4fc58a;
   --aviso: #e9a84c;
@@ -66,12 +69,71 @@
   --color-acento: var(--acento);
   --color-acento-fuerte: var(--acento-fuerte);
   --color-acento-texto: var(--acento-texto);
+  --color-brillo: var(--brillo);
   --color-peligro: var(--peligro);
   --color-exito: var(--exito);
   --color-aviso: var(--aviso);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --font-display: var(--font-montserrat);
+  --font-display: var(--font-bricolage);
+  --font-serif: var(--font-instrument);
+}
+
+/* ---------- Animaciones ---------- */
+@theme {
+  --ease-suave: cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-entrada: entrada 0.7s var(--ease-suave) both;
+  --animate-flotar: flotar 7s ease-in-out infinite;
+  --animate-aurora: aurora 16s ease-in-out infinite alternate;
+  --animate-marquesina: marquesina 45s linear infinite;
+  --animate-latido: latido 2.4s ease-in-out infinite;
+
+  @keyframes entrada {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+      filter: blur(4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+  }
+  @keyframes flotar {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    50% {
+      translate: 0 -12px;
+    }
+  }
+  @keyframes aurora {
+    0% {
+      transform: translate(-8%, 0) rotate(0deg) scale(1);
+    }
+    50% {
+      transform: translate(6%, 6%) rotate(20deg) scale(1.15);
+    }
+    100% {
+      transform: translate(10%, -4%) rotate(-10deg) scale(0.95);
+    }
+  }
+  @keyframes marquesina {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes latido {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 color-mix(in oklab, var(--acento) 55%, transparent);
+    }
+    50% {
+      box-shadow: 0 0 0 6px transparent;
+    }
+  }
 }
 
 body {
@@ -79,7 +141,7 @@ body {
   /* Un brillo verde muy suave arriba de todo */
   background-image: radial-gradient(
     ellipse 80% 420px at 50% -120px,
-    color-mix(in oklab, var(--acento) 9%, transparent),
+    color-mix(in oklab, var(--acento) 10%, transparent),
     transparent
   );
   background-repeat: no-repeat;
@@ -91,7 +153,7 @@ body {
   h2,
   h3 {
     font-family: var(--font-display);
-    letter-spacing: -0.015em;
+    letter-spacing: -0.025em;
   }
   ::selection {
     background: color-mix(in oklab, var(--acento) 25%, transparent);
@@ -102,14 +164,97 @@ body {
   }
 }
 
+@layer utilities {
+  /* Las listas aparecen en cascada: cada elemento lleva style={{ "--i": n }} */
+  .escalonado {
+    animation: var(--animate-entrada);
+    animation-delay: calc(min(var(--i, 0), 14) * 55ms);
+  }
+
+  /* Aparece al entrar en pantalla (en navegadores que lo soportan; si no, se ve directo) */
+  @supports (animation-timeline: view()) {
+    .revelar {
+      animation: entrada linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+  }
+
+  /* Grilla de puntos que se desvanece hacia los bordes */
+  .fondo-puntos {
+    background-image: radial-gradient(color-mix(in oklab, var(--texto) 16%, transparent) 1px, transparent 1.4px);
+    background-size: 22px 22px;
+    mask-image: radial-gradient(ellipse 75% 65% at 50% 35%, #000 25%, transparent 75%);
+  }
+
+  /* Texto con degradado verde */
+  .texto-degradado {
+    background: linear-gradient(100deg, var(--acento) 10%, var(--brillo) 55%, var(--acento-fuerte) 95%);
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Bordes de la marquesina que se desvanecen */
+  .mascara-lados {
+    mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Brillo que sigue al mouse (las coordenadas las pone <Spotlight />) */
+@utility spotlight {
+  position: relative;
+  isolation: isolate;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    background: radial-gradient(
+      420px circle at var(--x, 50%) var(--y, 50%),
+      color-mix(in oklab, var(--acento) 13%, transparent),
+      transparent 60%
+    );
+  }
+  &:hover::before {
+    opacity: 1;
+  }
+}
+
 @utility input {
   @apply w-full rounded-xl border border-borde bg-superficie px-3.5 py-2.5 text-sm transition outline-none placeholder:text-tenue/80 focus:border-acento focus:ring-4 focus:ring-acento/15;
 }
 @utility btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60;
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition duration-200 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60;
 }
+/* Botón principal con un destello que cruza al pasar el mouse */
 @utility btn-primario {
-  @apply btn bg-acento text-acento-texto shadow-sm shadow-acento/25 hover:bg-acento-fuerte dark:hover:text-acento-texto;
+  @apply btn relative overflow-hidden bg-acento text-acento-texto shadow-md shadow-acento/25 hover:-translate-y-px hover:bg-acento-fuerte hover:shadow-lg hover:shadow-acento/30 dark:hover:text-acento-texto;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.35) 50%, transparent 70%);
+    transform: translateX(-110%);
+    transition: transform 0.7s var(--ease-suave);
+  }
+  &:hover::after {
+    transform: translateX(110%);
+  }
 }
 @utility btn-secundario {
   @apply btn border border-borde bg-superficie hover:border-acento/40 hover:bg-suave;
@@ -122,7 +267,7 @@ body {
 }
 /* Tarjeta clickeable: se levanta un poco al pasar el mouse */
 @utility tarjeta-link {
-  @apply tarjeta transition duration-200 hover:-translate-y-0.5 hover:border-acento/50 hover:shadow-lg hover:shadow-acento/10;
+  @apply tarjeta spotlight transition duration-300 hover:-translate-y-1 hover:border-acento/50 hover:shadow-xl hover:shadow-acento/10;
 }
 @utility etiqueta {
   @apply mb-1.5 block text-sm font-medium;

@@ -39,7 +39,7 @@ export default async function BuscarPage({ searchParams }: { searchParams: Promi
 
   return (
     <div>
-      <h1 className="text-3xl font-bold">
+      <h1 className="text-4xl font-extrabold tracking-tighter">
         {q ? <>Resultados para «{q}»</> : "Buscar"}
       </h1>
 

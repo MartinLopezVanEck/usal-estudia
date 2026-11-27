@@ -39,7 +39,7 @@ export default async function ArchivoPage({ params }: { params: Promise<{ id: st
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-3xl font-bold">{a.titulo}</h1>
+            <h1 className="text-2xl font-extrabold tracking-tight sm:text-4xl">{a.titulo}</h1>
             {a.estado !== "aprobado" && <EstadoBadge estado={a.estado} />}
           </div>
           <p className="mt-1 text-sm text-tenue">

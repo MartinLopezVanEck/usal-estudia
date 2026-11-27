@@ -63,10 +63,10 @@ export function ListaArchivos({
 
   return (
     <ul className="tarjeta divide-y divide-borde overflow-hidden">
-      {archivos.map((a) => (
-        <li key={a.id}>
+      {archivos.map((a, i) => (
+        <li key={a.id} className="escalonado" style={{ "--i": i } as React.CSSProperties}>
           <Link href={`/archivos/${a.id}`} className="group flex items-start gap-3.5 p-4 transition hover:bg-suave">
-            <span className="mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-acento/10 font-mono text-[10px] font-semibold uppercase text-acento">
+            <span className="mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-acento/10 font-mono text-[10px] font-semibold uppercase text-acento transition duration-300 group-hover:-rotate-6 group-hover:scale-110 group-hover:bg-acento group-hover:text-acento-texto">
               {extension(a.nombre_original) || "?"}
             </span>
             <div className="min-w-0 flex-1">

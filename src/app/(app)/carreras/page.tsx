@@ -11,24 +11,25 @@ export default async function InicioPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold">Carreras</h1>
-      <p className="mt-1 text-sm text-tenue">
-        Elegí tu carrera para ver las materias por año.
-      </p>
+      <p className="text-sm font-semibold uppercase tracking-widest text-acento">Explorá</p>
+      <h1 className="mt-2 text-4xl font-extrabold tracking-tighter sm:text-5xl">
+        Elegí tu <span className="font-serif font-normal italic text-acento">carrera</span>
+      </h1>
+      <p className="mt-3 text-tenue">Vas a ver las materias ordenadas por año y cuatrimestre.</p>
 
       {!carreras?.length ? (
-        <p className="tarjeta mt-6 p-6 text-center text-sm text-tenue">
+        <p className="tarjeta mt-8 p-6 text-center text-sm text-tenue">
           Todavía no hay carreras cargadas.
         </p>
       ) : (
-        <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {carreras.map((c) => (
-            <li key={c.id}>
+        <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {carreras.map((c, i) => (
+            <li key={c.id} className="escalonado" style={{ "--i": i } as React.CSSProperties}>
               <Link
                 href={`/carreras/${c.slug}`}
                 className="tarjeta-link group flex h-full items-center gap-4 p-5"
               >
-                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-acento/10 text-acento transition group-hover:bg-acento group-hover:text-acento-texto">
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-acento/10 text-acento transition duration-300 group-hover:rotate-[-6deg] group-hover:scale-110 group-hover:bg-acento group-hover:text-acento-texto">
                   <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                     <path d="M22 10 12 5 2 10l10 5 10-5z" />
                     <path d="M6 12v5c3 2 9 2 12 0v-5" />

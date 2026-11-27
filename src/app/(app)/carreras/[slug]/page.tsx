@@ -38,7 +38,7 @@ export default async function CarreraPage({ params }: { params: Promise<{ slug: 
   return (
     <div>
       <Migas items={[{ label: carrera.nombre }]} />
-      <h1 className="text-3xl font-bold">{carrera.nombre}</h1>
+      <h1 className="text-4xl font-extrabold tracking-tighter sm:text-5xl">{carrera.nombre}</h1>
 
       {anios.length === 0 && (
         <p className="tarjeta mt-6 p-6 text-center text-sm text-tenue">
@@ -47,18 +47,16 @@ export default async function CarreraPage({ params }: { params: Promise<{ slug: 
       )}
 
       <div className="mt-8 space-y-10">
-        {anios.map((anio) => (
-          <section key={anio}>
-            <h2 className="mb-4 flex items-center gap-3 text-lg font-bold">
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-acento text-sm text-acento-texto">
-                {anio}°
-              </span>
+        {anios.map((anio, i) => (
+          <section key={anio} className="escalonado" style={{ "--i": i * 2 } as React.CSSProperties}>
+            <h2 className="mb-4 flex items-baseline gap-3 text-xl font-bold">
+              <span className="font-serif text-5xl font-normal italic leading-none text-acento">{anio}°</span>
               Año
-              <span aria-hidden className="h-px flex-1 bg-borde" />
+              <span aria-hidden className="h-px flex-1 self-center bg-linear-to-r from-borde to-transparent" />
             </h2>
             <div className="grid gap-4 md:grid-cols-3">
               {ORDEN_CUATRI.filter((c) => porAnio.get(anio)!.has(c)).map((c) => (
-                <div key={c} className="tarjeta p-4">
+                <div key={c} className="tarjeta spotlight p-4">
                   <h3 className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-acento">
                     {CUATRIMESTRES[c]}
                   </h3>
@@ -71,9 +69,12 @@ export default async function CarreraPage({ params }: { params: Promise<{ slug: 
                         <li key={m.slug}>
                           <Link
                             href={`/materias/${m.slug}?carrera=${slug}`}
-                            className="block rounded-lg px-2 py-1.5 text-sm transition hover:bg-acento/10 hover:text-acento"
+                            className="group flex items-center justify-between rounded-lg px-2 py-1.5 text-sm transition hover:bg-acento/10 hover:text-acento"
                           >
                             {m.nombre}
+                            <span aria-hidden className="-translate-x-1 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100">
+                              →
+                            </span>
                           </Link>
                         </li>
                       ))}

@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { Buscador } from "@/components/buscador";
 import { BotonTema } from "@/components/boton-tema";
 import { Logo } from "@/components/logo";
+import { NavLink } from "@/components/nav-links";
 
 async function contarPendientes() {
   const db = createAdminClient();
@@ -24,49 +25,51 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-20 border-b border-borde/80 bg-superficie/80 backdrop-blur-lg">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
-          <Link href="/" aria-label="Usal Estudia, inicio">
+      <header className="sticky top-0 z-20 px-3 pt-3">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl border border-borde/80 bg-superficie/75 px-4 py-2.5 shadow-lg shadow-black/[0.03] backdrop-blur-xl">
+          <Link href="/" aria-label="Usal Estudia, inicio" className="transition hover:opacity-80">
             <Logo />
           </Link>
-          <div className="order-last w-full sm:order-none sm:w-auto sm:flex-1">
+          <div className="order-last w-full sm:order-none sm:w-auto sm:max-w-md sm:flex-1">
             <Suspense>
               <Buscador />
             </Suspense>
           </div>
           <nav className="ml-auto flex items-center gap-1 text-sm font-medium">
-            <Link href="/carreras" className="rounded-lg px-3 py-1.5 text-tenue transition hover:bg-suave hover:text-texto">
-              Carreras
-            </Link>
-            <Link href="/subir" className="btn-primario px-3 py-1.5">
-              Subir
-            </Link>
-            <Link href="/mis-aportes" className="rounded-lg px-3 py-1.5 text-tenue transition hover:bg-suave hover:text-texto">
-              Mis aportes
-            </Link>
+            <NavLink href="/carreras">Carreras</NavLink>
+            <NavLink href="/mis-aportes">Mis aportes</NavLink>
             {esAdmin && (
-              <Link href="/admin" className="relative rounded-lg px-3 py-1.5 text-tenue transition hover:bg-suave hover:text-texto">
+              <NavLink href="/admin">
                 Admin
                 {pendientes > 0 && (
-                  <span className="ml-1 rounded-full bg-aviso px-1.5 py-0.5 text-xs font-semibold text-acento-texto">
+                  <span className="ml-1.5 inline-grid h-5 min-w-5 place-items-center rounded-full bg-aviso px-1 text-[11px] font-bold text-acento-texto">
                     {pendientes}
                   </span>
                 )}
-              </Link>
+              </NavLink>
             )}
+            <Link href="/subir" className="btn-primario ml-1 rounded-full px-4 py-1.5">
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden>
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              Subir
+            </Link>
             <BotonTema />
             <form action="/auth/salir" method="post">
               <button
-                className="rounded-lg px-3 py-1.5 text-tenue transition hover:bg-peligro/10 hover:text-peligro"
-                title={perfil.email}
+                className="rounded-full p-2 text-tenue transition hover:bg-peligro/10 hover:text-peligro"
+                title={`Salir (${perfil.email})`}
+                aria-label="Salir"
               >
-                Salir
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+                </svg>
               </button>
             </form>
           </nav>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
+      <main className="mx-auto max-w-6xl px-4 py-10">{children}</main>
     </div>
   );
 }
