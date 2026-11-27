@@ -3,7 +3,6 @@ import { requireAdmin } from "@/lib/auth";
 
 const SECCIONES = [
   { href: "/admin", label: "Pendientes" },
-  { href: "/admin/reportes", label: "Reportes" },
   { href: "/admin/catalogo", label: "Carreras y materias" },
   { href: "/admin/profesores", label: "Profesores" },
   { href: "/admin/usuarios", label: "Usuarios" },

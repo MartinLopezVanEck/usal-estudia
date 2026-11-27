@@ -16,9 +16,7 @@ async function contarPendientes() {
       db.from(t).select("id", { count: "exact", head: true }).eq("estado", "pendiente"),
     ),
   );
-  // Reportes sin resolver (si la tabla todavía no existe, cuenta 0).
-  const reportes = await db.from("reportes").select("id", { count: "exact", head: true }).eq("resuelto", false);
-  return conteos.reduce((total, { count }) => total + (count ?? 0), reportes.count ?? 0);
+  return conteos.reduce((total, { count }) => total + (count ?? 0), 0);
 }
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {

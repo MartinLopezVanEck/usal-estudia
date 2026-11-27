@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Suspense } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -26,9 +25,7 @@ export default async function InicioPage({ searchParams }: { searchParams: Promi
       <p className="mt-2 text-tenue">Elegí tu carrera para ver las materias por año y cuatrimestre.</p>
 
       <div className="mt-8 space-y-8 empty:hidden">
-        <Suspense>
-          <MisMaterias />
-        </Suspense>
+        <MisMaterias />
         <Recientes />
       </div>
 

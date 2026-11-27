@@ -53,7 +53,6 @@ export function ListaArchivos({
   mostrarEstado = false,
   vacio = "Todavía no hay archivos acá.",
   sufijo = "",
-  votos,
 }: {
   archivos: ArchivoVisible[];
   mostrarMateria?: boolean;
@@ -61,7 +60,6 @@ export function ListaArchivos({
   vacio?: string;
   /** Filtros de la lista ("?profesor=..."), para que el visor recorra la misma lista. */
   sufijo?: string;
-  votos?: Map<string, number>;
 }) {
   if (archivos.length === 0) {
     return <p className="tarjeta p-6 text-center text-sm text-tenue">{vacio}</p>;
@@ -82,11 +80,6 @@ export function ListaArchivos({
                   {TIPOS_MATERIAL[a.tipo]}
                 </span>
                 {mostrarEstado && <EstadoBadge estado={a.estado} />}
-                {!!votos?.get(a.id) && (
-                  <span className="text-xs text-acento" title="Personas a las que les sirvió">
-                    ▲ {votos.get(a.id)}
-                  </span>
-                )}
               </div>
               <p className="mt-1 text-xs text-tenue">
                 {[

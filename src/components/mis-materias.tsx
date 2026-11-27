@@ -1,17 +1,12 @@
+"use client";
+
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { useSyncExternalStore } from "react";
+import { leerMisMaterias, misMateriasServidor, suscribirMisMaterias } from "@/lib/mis-materias";
 
-/** Materias fijadas por el alumno. No muestra nada si no tiene ninguna (o si falta la migración 0005). */
-export async function MisMaterias() {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("materias_fijadas")
-    .select("materias(nombre, slug, estado)")
-    .order("created_at");
-
-  const materias = (data ?? [])
-    .map((f) => f.materias as unknown as { nombre: string; slug: string; estado: string } | null)
-    .filter((m): m is { nombre: string; slug: string; estado: string } => m?.estado === "aprobado");
+/** Materias fijadas con la estrella. No muestra nada si no hay ninguna. */
+export function MisMaterias() {
+  const materias = useSyncExternalStore(suscribirMisMaterias, leerMisMaterias, misMateriasServidor);
   if (materias.length === 0) return null;
 
   return (

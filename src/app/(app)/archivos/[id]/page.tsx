@@ -4,12 +4,12 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { obtenerPerfil } from "@/lib/auth";
 import { COOKIE_CARRERA, TIPOS_MATERIAL, extension, formatearTamano, tipoVistaPrevia } from "@/lib/constants";
-import { ORDENES, consulta, filtrarYOrdenar, leerFiltros, mapaVotos, type FiltrosMateria } from "@/lib/archivos-materia";
+import { ORDENES, consulta, filtrarYOrdenar, leerFiltros, type FiltrosMateria } from "@/lib/archivos-materia";
 import { Migas } from "@/components/migas";
 import { RegistrarVisita } from "@/components/recientes";
 import { COLUMNAS_ARCHIVO, EstadoBadge, type ArchivoVisible } from "@/components/lista-archivos";
 import { AtajosVisor } from "@/components/visor/atajos";
-import { BotonUtil, CopiarLink, Reportar } from "@/components/visor/acciones-archivo";
+import { CopiarLink } from "@/components/visor/acciones-archivo";
 import { CentrarActual } from "@/components/visor/centrar-actual";
 import { VisorPdf } from "@/components/visor/visor-pdf";
 import { AccionesRevision } from "../../admin/acciones-revision";
@@ -54,10 +54,8 @@ export default async function ArchivoPage({
   if (!data) notFound();
   const a = data as ArchivoVisible;
 
-  const [{ data: hermanosData }, { data: votosData }, { data: miVoto }, { data: materia }, almacen] = await Promise.all([
+  const [{ data: hermanosData }, { data: materia }, almacen] = await Promise.all([
     supabase.from("archivos_visibles").select(COLUMNAS_ARCHIVO).eq("materia_id", a.materia_id).eq("estado", "aprobado"),
-    supabase.from("archivo_votos_conteo").select("archivo_id, votos").eq("materia_id", a.materia_id),
-    supabase.from("archivo_votos").select("archivo_id").eq("archivo_id", a.id).maybeSingle(),
     supabase
       .from("materias")
       .select("plan_materias(anio, carreras(nombre, slug, estado))")
@@ -66,15 +64,14 @@ export default async function ArchivoPage({
     cookies(),
   ]);
   const todos = (hermanosData ?? []) as ArchivoVisible[];
-  const votos = mapaVotos(votosData);
 
   // La lista que recorren las flechas: la misma que estabas viendo en la materia.
   // Si este archivo no entra en esos filtros (ej. llegaste desde el buscador), se usan todos.
   let filtrosLista: FiltrosMateria = filtros;
-  let lista = filtrarYOrdenar(todos, filtros, votos);
+  let lista = filtrarYOrdenar(todos, filtros);
   if (!lista.some((x) => x.id === a.id)) {
     filtrosLista = { carrera: filtros.carrera, orden: filtros.orden };
-    lista = filtrarYOrdenar(todos, filtrosLista, votos);
+    lista = filtrarYOrdenar(todos, filtrosLista);
   }
   const pos = lista.findIndex((x) => x.id === a.id);
   const sufijo = consulta(filtrosLista);
@@ -91,10 +88,10 @@ export default async function ArchivoPage({
     planes[0];
   const volver = `/materias/${a.materia_slug}${consulta({ ...filtrosLista, carrera: filtrosLista.carrera ?? plan?.carreras?.slug })}`;
 
-  // Relacionados: mismo tipo o misma cátedra, los más útiles primero.
+  // Relacionados: mismo tipo o misma cátedra, los más recientes primero.
   const relacionados = todos
     .filter((x) => x.id !== a.id && (x.tipo === a.tipo || (a.profesor_id !== null && x.profesor_id === a.profesor_id)))
-    .sort((x, y) => ORDENES.utiles.comparar(x, y, votos))
+    .sort(ORDENES.recientes.comparar)
     .slice(0, 4);
 
   const vista = tipoVistaPrevia(a.nombre_original);
@@ -177,12 +174,6 @@ export default async function ArchivoPage({
               </a>
             )}
             <CopiarLink id={a.id} />
-            {a.estado === "aprobado" && (
-              <BotonUtil id={a.id} votos={votos.get(a.id) ?? 0} votado={Boolean(miVoto)} />
-            )}
-            <div className="ml-auto self-center">
-              <Reportar id={a.id} />
-            </div>
           </div>
 
           {esAdmin && (

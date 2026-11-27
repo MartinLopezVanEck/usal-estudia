@@ -16,8 +16,6 @@ export type FiltrosMateria = {
 
 const CLAVES = ["carrera", "profesor", "tipo", "orden", "anio"] as const;
 
-export type Votos = Map<string, number>;
-
 const ORDEN_TIPOS = Object.keys(TIPOS_MATERIAL);
 
 /** Los archivos sin año van siempre al final. */
@@ -32,12 +30,7 @@ const recientes = (a: ArchivoVisible, b: ArchivoVisible) =>
   porAnio(a, b, -1) || b.created_at.localeCompare(a.created_at);
 
 export const ORDENES = {
-  recientes: { etiqueta: "Más recientes", comparar: (a: ArchivoVisible, b: ArchivoVisible) => recientes(a, b) },
-  utiles: {
-    etiqueta: "Más útiles",
-    comparar: (a: ArchivoVisible, b: ArchivoVisible, votos: Votos) =>
-      (votos.get(b.id) ?? 0) - (votos.get(a.id) ?? 0) || recientes(a, b),
-  },
+  recientes: { etiqueta: "Más recientes", comparar: recientes },
   antiguos: {
     etiqueta: "Más antiguos",
     comparar: (a: ArchivoVisible, b: ArchivoVisible) => porAnio(a, b, 1) || a.titulo.localeCompare(b.titulo),
@@ -75,7 +68,7 @@ export function consulta(filtros: FiltrosMateria, cambios: FiltrosMateria = {}) 
   return s ? `?${s}` : "";
 }
 
-export function filtrarYOrdenar(archivos: ArchivoVisible[], f: FiltrosMateria, votos: Votos) {
+export function filtrarYOrdenar(archivos: ArchivoVisible[], f: FiltrosMateria) {
   const orden = ORDENES[ordenValido(f.orden)];
   return archivos
     .filter(
@@ -84,10 +77,5 @@ export function filtrarYOrdenar(archivos: ArchivoVisible[], f: FiltrosMateria, v
         (!f.tipo || a.tipo === f.tipo) &&
         (!f.anio || String(a.anio_cursada) === f.anio),
     )
-    .sort((a, b) => orden.comparar(a, b, votos));
-}
-
-/** Pasa las filas de archivo_votos_conteo a un Map (vacío si la tabla todavía no existe). */
-export function mapaVotos(filas: { archivo_id: string; votos: number }[] | null): Votos {
-  return new Map((filas ?? []).map((f) => [f.archivo_id, f.votos]));
+    .sort(orden.comparar);
 }

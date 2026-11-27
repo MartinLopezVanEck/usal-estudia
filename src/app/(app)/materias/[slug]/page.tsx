@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { COOKIE_CARRERA, TIPOS_MATERIAL, type TipoMaterial } from "@/lib/constants";
-import { ORDENES, consulta, filtrarYOrdenar, leerFiltros, mapaVotos, ordenValido, type Orden } from "@/lib/archivos-materia";
+import { ORDENES, consulta, filtrarYOrdenar, leerFiltros, ordenValido, type Orden } from "@/lib/archivos-materia";
 import { Migas } from "@/components/migas";
 import { BotonFijar } from "@/components/boton-fijar";
 import { RegistrarVisita } from "@/components/recientes";
@@ -31,20 +31,16 @@ export default async function MateriaPage({
     .single();
   if (!materia) notFound();
 
-  const [{ data: catedras }, { data: archivosData }, { data: votosData }, { data: fijada }] = await Promise.all([
+  const [{ data: catedras }, { data: archivosData }] = await Promise.all([
     supabase
       .from("catedras")
       .select("profesores!inner(id, nombre, estado)")
       .eq("materia_id", materia.id)
       .eq("profesores.estado", "aprobado"),
     supabase.from("archivos_visibles").select(COLUMNAS_ARCHIVO).eq("materia_id", materia.id).eq("estado", "aprobado"),
-    // Si la migración 0005 todavía no se corrió, estas dos vuelven vacías y la página sigue andando.
-    supabase.from("archivo_votos_conteo").select("archivo_id, votos").eq("materia_id", materia.id),
-    supabase.from("materias_fijadas").select("materia_id").eq("materia_id", materia.id).maybeSingle(),
   ]);
 
   const archivos = (archivosData ?? []) as ArchivoVisible[];
-  const votos = mapaVotos(votosData);
   const profesores = (catedras ?? [])
     .map((c) => c.profesores as unknown as { id: string; nombre: string })
     .sort((a, b) => a.nombre.localeCompare(b.nombre));
@@ -52,7 +48,7 @@ export default async function MateriaPage({
   const conteo = (profId: string | null) => archivos.filter((a) => a.profesor_id === profId).length;
   const sinProfesor = conteo(null);
 
-  const filtrados = filtrarYOrdenar(archivos, filtros, votos);
+  const filtrados = filtrarYOrdenar(archivos, filtros);
   const tiposPresentes = [...new Set(archivos.map((a) => a.tipo))];
   const aniosPresentes = [...new Set(archivos.map((a) => a.anio_cursada).filter((a): a is number => a !== null))].sort(
     (a, b) => b - a,
@@ -101,7 +97,7 @@ export default async function MateriaPage({
       <div className="flex flex-wrap items-end justify-between gap-3">
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{materia.nombre}</h1>
         <div className="flex flex-wrap items-start gap-2">
-          <BotonFijar materiaId={materia.id} fijada={Boolean(fijada)} />
+          <BotonFijar slug={slug} nombre={materia.nombre} />
           <Link href={`/subir?materia=${materia.id}`} className="btn-secundario">
             Subir material
           </Link>
@@ -185,7 +181,6 @@ export default async function MateriaPage({
             archivos={filtrados}
             mostrarMateria={false}
             sufijo={consulta(conCarrera)}
-            votos={votos}
             vacio="No hay material para este filtro. ¡Podés ser el primero en subir algo!"
           />
         </section>

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { CUATRIMESTRES, type Cuatrimestre } from "@/lib/constants";
@@ -65,9 +64,7 @@ export default async function CarreraPage({ params }: { params: Promise<{ slug: 
       </div>
 
       <div className="mt-8 space-y-8 empty:hidden">
-        <Suspense>
-          <MisMaterias />
-        </Suspense>
+        <MisMaterias />
         <Recientes />
       </div>
 
