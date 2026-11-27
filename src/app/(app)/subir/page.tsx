@@ -33,7 +33,7 @@ export default async function SubirPage({
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-4xl font-extrabold tracking-tighter">Subir material</h1>
+      <h1 className="text-3xl font-bold tracking-tight">Subir material</h1>
       <p className="mt-1 text-sm text-tenue">
         {perfil.rol === "admin"
           ? "Como sos admin, lo que subas se publica directamente."

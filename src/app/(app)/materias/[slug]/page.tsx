@@ -120,7 +120,7 @@ export default async function MateriaPage({
         ]}
       />
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <h1 className="text-2xl font-extrabold tracking-tight sm:text-4xl">{materia.nombre}</h1>
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{materia.nombre}</h1>
         <Link href={`/subir?materia=${materia.id}`} className="btn-secundario">
           Subir material de esta materia
         </Link>

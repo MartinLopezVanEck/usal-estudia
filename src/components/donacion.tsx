@@ -26,9 +26,8 @@ export function Donacion() {
   }
 
   return (
-    <section className="tarjeta relative isolate overflow-hidden p-6 sm:p-8">
-      <div aria-hidden className="pointer-events-none absolute -right-16 -top-16 -z-10 h-56 w-56 rounded-full bg-acento/15 blur-3xl" />
-      <h2 className="text-2xl font-bold">¿Te sirvió? Bancá a los admins</h2>
+    <section className="rounded-2xl bg-suave p-6 sm:p-8">
+      <h2 className="text-2xl font-bold tracking-tight">¿Te sirvió? Bancá a los admins</h2>
       <p className="mt-2 max-w-2xl text-tenue">
         La página es gratis y sin publicidad. Mantenerla lleva tiempo: revisar cada aporte, ordenar las
         materias y pagar el almacenamiento cuando crezca. Si te salvó un parcial, podés colaborar con{" "}
@@ -41,7 +40,7 @@ export function Donacion() {
           </a>
         )}
         {alias && (
-          <div className="flex items-center gap-2 rounded-xl border border-borde bg-suave px-3 py-2 text-sm">
+          <div className="flex items-center gap-2 rounded-xl border border-borde bg-superficie px-3 py-2 text-sm">
             <span className="text-tenue">{url ? "Alias:" : "Transferí al alias"}</span>
             <span className="font-mono font-medium">{alias}</span>
             <button type="button" onClick={copiar} className="font-semibold text-acento hover:underline">

@@ -25,8 +25,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-20 px-3 pt-3">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl border border-borde/80 bg-superficie/75 px-4 py-2.5 shadow-lg shadow-black/[0.03] backdrop-blur-xl">
+      <header className="sticky top-0 z-20 border-b border-borde bg-fondo/85 backdrop-blur-lg">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5">
           <Link href="/" aria-label="Usal Estudia, inicio" className="transition hover:opacity-80">
             <Logo />
           </Link>

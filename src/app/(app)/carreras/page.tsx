@@ -11,11 +11,8 @@ export default async function InicioPage() {
 
   return (
     <div>
-      <p className="text-sm font-semibold uppercase tracking-widest text-acento">Explorá</p>
-      <h1 className="mt-2 text-4xl font-extrabold tracking-tighter sm:text-5xl">
-        Elegí tu <span className="font-serif font-normal italic text-acento">carrera</span>
-      </h1>
-      <p className="mt-3 text-tenue">Vas a ver las materias ordenadas por año y cuatrimestre.</p>
+      <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Carreras</h1>
+      <p className="mt-2 text-tenue">Elegí tu carrera para ver las materias por año y cuatrimestre.</p>
 
       {!carreras?.length ? (
         <p className="tarjeta mt-8 p-6 text-center text-sm text-tenue">
