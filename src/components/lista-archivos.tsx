@@ -13,6 +13,7 @@ export type ArchivoVisible = {
   titulo: string;
   descripcion: string | null;
   tipo: TipoMaterial;
+  materia_id: string;
   materia_nombre: string;
   materia_slug: string;
   profesor_id: string | null;
@@ -30,7 +31,7 @@ export type ArchivoVisible = {
 };
 
 export const COLUMNAS_ARCHIVO =
-  "id, titulo, descripcion, tipo, materia_nombre, materia_slug, profesor_id, profesor_nombre, anio_cursada, nombre_original, tamano, anonimo, estado, motivo_rechazo, created_at, es_mio, autor_nombre, autor_email";
+  "id, titulo, descripcion, tipo, materia_id, materia_nombre, materia_slug, profesor_id, profesor_nombre, anio_cursada, nombre_original, tamano, anonimo, estado, motivo_rechazo, created_at, es_mio, autor_nombre, autor_email";
 
 const COLOR_ESTADO: Record<EstadoRevision, string> = {
   pendiente: "bg-aviso/15 text-aviso",
@@ -51,11 +52,16 @@ export function ListaArchivos({
   mostrarMateria = false,
   mostrarEstado = false,
   vacio = "Todavía no hay archivos acá.",
+  sufijo = "",
+  votos,
 }: {
   archivos: ArchivoVisible[];
   mostrarMateria?: boolean;
   mostrarEstado?: boolean;
   vacio?: string;
+  /** Filtros de la lista ("?profesor=..."), para que el visor recorra la misma lista. */
+  sufijo?: string;
+  votos?: Map<string, number>;
 }) {
   if (archivos.length === 0) {
     return <p className="tarjeta p-6 text-center text-sm text-tenue">{vacio}</p>;
@@ -65,7 +71,7 @@ export function ListaArchivos({
     <ul className="tarjeta divide-y divide-borde overflow-hidden">
       {archivos.map((a, i) => (
         <li key={a.id} className="escalonado" style={{ "--i": i } as React.CSSProperties}>
-          <Link href={`/archivos/${a.id}`} className="group flex items-start gap-3.5 p-4 transition hover:bg-suave">
+          <Link href={`/archivos/${a.id}${sufijo}`} className="group flex items-start gap-3.5 p-4 transition hover:bg-suave">
             <span className="mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-acento/10 font-mono text-[10px] font-semibold uppercase text-acento transition duration-300 group-hover:-rotate-6 group-hover:scale-110 group-hover:bg-acento group-hover:text-acento-texto">
               {extension(a.nombre_original) || "?"}
             </span>
@@ -76,6 +82,11 @@ export function ListaArchivos({
                   {TIPOS_MATERIAL[a.tipo]}
                 </span>
                 {mostrarEstado && <EstadoBadge estado={a.estado} />}
+                {!!votos?.get(a.id) && (
+                  <span className="text-xs text-acento" title="Personas a las que les sirvió">
+                    ▲ {votos.get(a.id)}
+                  </span>
+                )}
               </div>
               <p className="mt-1 text-xs text-tenue">
                 {[

@@ -283,3 +283,13 @@ export async function cambiarRol(fd: FormData) {
   await createAdminClient().from("profiles").update({ rol }).eq("id", id);
   refrescar();
 }
+
+// ---------------------------------------------------------------------------
+// Reportes de archivos
+// ---------------------------------------------------------------------------
+
+export async function resolverReporte(id: string) {
+  await requireAdmin();
+  await createAdminClient().from("reportes").update({ resuelto: true }).eq("id", id);
+  refrescar();
+}

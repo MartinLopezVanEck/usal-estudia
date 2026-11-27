@@ -35,6 +35,18 @@ export const ESTADOS: Record<EstadoRevision, string> = {
   rechazado: "Rechazado",
 };
 
+/** Cookie con la última carrera abierta ("Carreras" te lleva directo ahí). */
+export const COOKIE_CARRERA = "carrera";
+
+export const MOTIVOS_REPORTE = {
+  materia_incorrecta: "Está en la materia o el profesor equivocado",
+  ilegible: "No se ve o está incompleto",
+  duplicado: "Está repetido",
+  inapropiado: "Contenido inapropiado o con datos personales",
+  otro: "Otro",
+} as const;
+export type MotivoReporte = keyof typeof MOTIVOS_REPORTE;
+
 /** Extensiones bloqueadas por seguridad (ejecutables). Todo lo demás se acepta. */
 export const EXTENSIONES_BLOQUEADAS = [
   "exe", "msi", "bat", "cmd", "com", "scr", "ps1", "vbs", "jar", "app", "dmg", "apk", "sh",

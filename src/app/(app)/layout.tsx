@@ -6,6 +6,7 @@ import { Buscador } from "@/components/buscador";
 import { BotonTema } from "@/components/boton-tema";
 import { Logo } from "@/components/logo";
 import { NavLink } from "@/components/nav-links";
+import { BarraInferior } from "@/components/barra-inferior";
 
 async function contarPendientes() {
   const db = createAdminClient();
@@ -15,7 +16,9 @@ async function contarPendientes() {
       db.from(t).select("id", { count: "exact", head: true }).eq("estado", "pendiente"),
     ),
   );
-  return conteos.reduce((total, { count }) => total + (count ?? 0), 0);
+  // Reportes sin resolver (si la tabla todavía no existe, cuenta 0).
+  const reportes = await db.from("reportes").select("id", { count: "exact", head: true }).eq("resuelto", false);
+  return conteos.reduce((total, { count }) => total + (count ?? 0), reportes.count ?? 0);
 }
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -36,10 +39,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             </Suspense>
           </div>
           <nav className="ml-auto flex items-center gap-1 text-sm font-medium">
-            <NavLink href="/carreras">Carreras</NavLink>
-            <NavLink href="/mis-aportes">Mis aportes</NavLink>
+            <span className="hidden items-center gap-1 sm:flex">
+              <NavLink href="/carreras">Carreras</NavLink>
+              <NavLink href="/mis-aportes">Mis aportes</NavLink>
+            </span>
             {esAdmin && (
-              <NavLink href="/admin">
+              <NavLink href="/admin" className="hidden sm:block">
                 Admin
                 {pendientes > 0 && (
                   <span className="ml-1.5 inline-grid h-5 min-w-5 place-items-center rounded-full bg-aviso px-1 text-[11px] font-bold text-acento-texto">
@@ -48,7 +53,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                 )}
               </NavLink>
             )}
-            <Link href="/subir" className="btn-primario ml-1 rounded-full px-4 py-1.5">
+            <Link href="/subir" className="btn-primario ml-1 hidden rounded-full px-4 py-1.5 sm:inline-flex">
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden>
                 <path d="M12 5v14M5 12h14" />
               </svg>
@@ -69,7 +74,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </nav>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-10">{children}</main>
+      <main className="mx-auto max-w-6xl px-4 pb-28 pt-8 sm:py-10">{children}</main>
+      <BarraInferior esAdmin={esAdmin} pendientes={pendientes} />
     </div>
   );
 }

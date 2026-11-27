@@ -1,8 +1,13 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { CUATRIMESTRES, type Cuatrimestre } from "@/lib/constants";
 import { Migas } from "@/components/migas";
+import { MisMaterias } from "@/components/mis-materias";
+import { Recientes } from "@/components/recientes";
+import { RecordarCarrera } from "@/components/recordar-carrera";
+import { FiltroMaterias, type AnioPlan } from "@/components/filtro-materias";
 
 const ORDEN_CUATRI: Cuatrimestre[] = ["anual", "primero", "segundo"];
 
@@ -18,72 +23,61 @@ export default async function CarreraPage({ params }: { params: Promise<{ slug: 
     .single();
   if (!carrera) notFound();
 
-  const { data: plan } = await supabase
+  const { data: filas } = await supabase
     .from("plan_materias")
     .select("anio, cuatrimestre, materias!inner(id, nombre, slug, estado)")
     .eq("carrera_id", carrera.id)
     .eq("materias.estado", "aprobado");
 
   const porAnio = new Map<number, Map<Cuatrimestre, { nombre: string; slug: string }[]>>();
-  for (const fila of plan ?? []) {
+  for (const fila of filas ?? []) {
     const materia = fila.materias as unknown as { nombre: string; slug: string };
     const anio = porAnio.get(fila.anio) ?? new Map();
     const lista = anio.get(fila.cuatrimestre) ?? [];
-    lista.push(materia);
+    lista.push({ nombre: materia.nombre, slug: materia.slug });
     anio.set(fila.cuatrimestre, lista);
     porAnio.set(fila.anio, anio);
   }
-  const anios = [...porAnio.keys()].sort((a, b) => a - b);
+
+  const plan: AnioPlan[] = [...porAnio.keys()]
+    .sort((a, b) => a - b)
+    .map((anio) => ({
+      anio,
+      cuatrimestres: ORDEN_CUATRI.filter((c) => porAnio.get(anio)!.has(c)).map((c) => ({
+        clave: c,
+        etiqueta: CUATRIMESTRES[c],
+        materias: porAnio
+          .get(anio)!
+          .get(c)!
+          .sort((a, b) => a.nombre.localeCompare(b.nombre)),
+      })),
+    }));
 
   return (
     <div>
+      <RecordarCarrera slug={slug} />
       <Migas items={[{ label: carrera.nombre }]} />
-      <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{carrera.nombre}</h1>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{carrera.nombre}</h1>
+        <Link href="/carreras?todas=1" className="text-sm text-tenue transition hover:text-acento">
+          Cambiar de carrera
+        </Link>
+      </div>
 
-      {anios.length === 0 && (
+      <div className="mt-8 space-y-8 empty:hidden">
+        <Suspense>
+          <MisMaterias />
+        </Suspense>
+        <Recientes />
+      </div>
+
+      {plan.length === 0 ? (
         <p className="tarjeta mt-6 p-6 text-center text-sm text-tenue">
           Esta carrera todavía no tiene materias cargadas.
         </p>
+      ) : (
+        <FiltroMaterias plan={plan} carrera={slug} />
       )}
-
-      <div className="mt-8 space-y-10">
-        {anios.map((anio, i) => (
-          <section key={anio} className="escalonado" style={{ "--i": i * 2 } as React.CSSProperties}>
-            <h2 className="mb-4 flex items-center gap-3 text-lg font-bold">
-              {anio}° año
-              <span aria-hidden className="h-px flex-1 bg-borde" />
-            </h2>
-            <div className="grid gap-4 md:grid-cols-3">
-              {ORDEN_CUATRI.filter((c) => porAnio.get(anio)!.has(c)).map((c) => (
-                <div key={c} className="tarjeta p-4">
-                  <h3 className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-acento">
-                    {CUATRIMESTRES[c]}
-                  </h3>
-                  <ul className="space-y-1">
-                    {porAnio
-                      .get(anio)!
-                      .get(c)!
-                      .sort((a, b) => a.nombre.localeCompare(b.nombre))
-                      .map((m) => (
-                        <li key={m.slug}>
-                          <Link
-                            href={`/materias/${m.slug}?carrera=${slug}`}
-                            className="group flex items-center justify-between rounded-lg px-2 py-1.5 text-sm transition hover:bg-acento/10 hover:text-acento"
-                          >
-                            {m.nombre}
-                            <span aria-hidden className="-translate-x-1 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100">
-                              →
-                            </span>
-                          </Link>
-                        </li>
-                      ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </section>
-        ))}
-      </div>
     </div>
   );
 }

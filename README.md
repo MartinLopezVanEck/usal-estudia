@@ -28,11 +28,13 @@ Carrera ─┬─ plan_materias (año + cuatrimestre) ─── Materia ─┬�
 1. Creá un proyecto en [supabase.com](https://supabase.com) (plan Free).
 2. **SQL Editor** → pegá y ejecutá todo [supabase/migrations/0001_init.sql](supabase/migrations/0001_init.sql)
    y después [0002_permisos.sql](supabase/migrations/0002_permisos.sql),
-   [0003_cuentas_externas.sql](supabase/migrations/0003_cuentas_externas.sql) y
-   [0004_seguridad.sql](supabase/migrations/0004_seguridad.sql), en ese orden.
+   [0003_cuentas_externas.sql](supabase/migrations/0003_cuentas_externas.sql),
+   [0004_seguridad.sql](supabase/migrations/0004_seguridad.sql) y
+   [0005_comunidad.sql](supabase/migrations/0005_comunidad.sql) (Mis materias, "Me sirvió" y reportes), en ese orden.
 
-   El Security Advisor va a seguir marcando *Security Definer View* en `archivos_visibles`: es intencional
-   (la vista filtra por usuario y oculta el autor de los archivos anónimos).
+   El Security Advisor va a seguir marcando *Security Definer View* en `archivos_visibles` y `archivo_votos_conteo`:
+   es intencional (la primera filtra por usuario y oculta el autor de los anónimos; la segunda muestra el total
+   de votos sin revelar quién votó).
 3. **Project Settings → API**: copiá `Project URL`, `anon public` y `service_role` (esta última es secreta).
 
 ### 2. Google (login)

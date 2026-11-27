@@ -2,39 +2,29 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { COLUMNAS_ARCHIVO, ListaArchivos, type ArchivoVisible } from "@/components/lista-archivos";
+import { coincide, palabras } from "@/lib/busqueda";
 
 export const metadata: Metadata = { title: "Buscar" };
 
-function normalizar(texto: string) {
-  return texto
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .replace(/[%_,()]/g, " ");
-}
-
 export default async function BuscarPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const { q = "" } = await searchParams;
-  const palabras = normalizar(q).split(/\s+/).filter(Boolean).slice(0, 8);
+  const buscadas = palabras(q);
   const supabase = await createClient();
 
   let archivos: ArchivoVisible[] = [];
   let materias: { nombre: string; slug: string }[] = [];
 
-  if (palabras.length) {
+  if (buscadas.length) {
     // Cada palabra tiene que aparecer en algún lado (título, materia, profesor, descripción).
     let consulta = supabase.from("archivos_visibles").select(COLUMNAS_ARCHIVO).eq("estado", "aprobado");
-    for (const p of palabras) consulta = consulta.ilike("busqueda", `%${p}%`);
+    for (const p of buscadas) consulta = consulta.ilike("busqueda", `%${p}%`);
 
     const [resArchivos, resMaterias] = await Promise.all([
       consulta.order("created_at", { ascending: false }).limit(100),
       supabase.from("materias").select("nombre, slug").eq("estado", "aprobado"),
     ]);
     archivos = (resArchivos.data ?? []) as ArchivoVisible[];
-    materias = (resMaterias.data ?? []).filter((m) => {
-      const nombre = normalizar(m.nombre);
-      return palabras.every((p) => nombre.includes(p));
-    });
+    materias = (resMaterias.data ?? []).filter((m) => coincide(m.nombre, buscadas));
   }
 
   return (
