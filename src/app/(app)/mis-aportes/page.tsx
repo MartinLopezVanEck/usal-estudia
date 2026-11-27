@@ -20,7 +20,7 @@ export default async function MisAportesPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold">Mis aportes</h1>
+      <h1 className="text-3xl font-bold">Mis aportes</h1>
       <p className="mt-1 text-sm text-tenue">
         {perfil.nombre} · {archivos.length} subidos · {aprobados} publicados
       </p>

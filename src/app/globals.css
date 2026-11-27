@@ -1,16 +1,19 @@
 @import "tailwindcss";
 
+/* Paleta basada en la de la USAL: verde institucional (#008357) y verde profundo (#08473b). */
 :root {
-  --fondo: #f6f7f9;
+  --fondo: #f4f7f6;
   --superficie: #ffffff;
-  --texto: #15181d;
-  --tenue: #5f6774;
-  --borde: #e2e5ea;
-  --acento: #1f4fa8;
+  --suave: #eaf1ee;
+  --texto: #0e1b17;
+  --tenue: #5a6b65;
+  --borde: #dde6e2;
+  --acento: #008357;
+  --acento-fuerte: #08473b;
   --acento-texto: #ffffff;
-  --peligro: #c2352b;
-  --exito: #1f7a4d;
-  --aviso: #a86200;
+  --peligro: #d42d33;
+  --exito: #16794a;
+  --aviso: #b45f06;
   color-scheme: light;
 }
 
@@ -18,31 +21,35 @@
    Sin JavaScript, se sigue el modo del sistema. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --fondo: #0f1115;
-    --superficie: #171a20;
-    --texto: #e7e9ee;
-    --tenue: #9aa2af;
-    --borde: #2a2f38;
-    --acento: #6e9bf0;
-    --acento-texto: #0f1115;
-    --peligro: #f07167;
-    --exito: #5cc28f;
-    --aviso: #e7a64a;
+    --fondo: #0a1411;
+    --superficie: #101c18;
+    --suave: #172621;
+    --texto: #e4eeea;
+    --tenue: #8fa39c;
+    --borde: #20302a;
+    --acento: #2fbf86;
+    --acento-fuerte: #6fdcae;
+    --acento-texto: #04140e;
+    --peligro: #f2676b;
+    --exito: #4fc58a;
+    --aviso: #e9a84c;
     color-scheme: dark;
   }
 }
 
 :root[data-theme="dark"] {
-  --fondo: #0f1115;
-  --superficie: #171a20;
-  --texto: #e7e9ee;
-  --tenue: #9aa2af;
-  --borde: #2a2f38;
-  --acento: #6e9bf0;
-  --acento-texto: #0f1115;
-  --peligro: #f07167;
-  --exito: #5cc28f;
-  --aviso: #e7a64a;
+  --fondo: #0a1411;
+  --superficie: #101c18;
+  --suave: #172621;
+  --texto: #e4eeea;
+  --tenue: #8fa39c;
+  --borde: #20302a;
+  --acento: #2fbf86;
+  --acento-fuerte: #6fdcae;
+  --acento-texto: #04140e;
+  --peligro: #f2676b;
+  --exito: #4fc58a;
+  --aviso: #e9a84c;
   color-scheme: dark;
 }
 
@@ -52,41 +59,71 @@
 @theme inline {
   --color-fondo: var(--fondo);
   --color-superficie: var(--superficie);
+  --color-suave: var(--suave);
   --color-texto: var(--texto);
   --color-tenue: var(--tenue);
   --color-borde: var(--borde);
   --color-acento: var(--acento);
+  --color-acento-fuerte: var(--acento-fuerte);
   --color-acento-texto: var(--acento-texto);
   --color-peligro: var(--peligro);
   --color-exito: var(--exito);
   --color-aviso: var(--aviso);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-montserrat);
 }
 
 body {
-  background: var(--fondo);
+  background-color: var(--fondo);
+  /* Un brillo verde muy suave arriba de todo */
+  background-image: radial-gradient(
+    ellipse 80% 420px at 50% -120px,
+    color-mix(in oklab, var(--acento) 9%, transparent),
+    transparent
+  );
+  background-repeat: no-repeat;
   color: var(--texto);
 }
 
+@layer base {
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--acento) 25%, transparent);
+  }
+  :focus-visible {
+    outline: 2px solid var(--acento);
+    outline-offset: 2px;
+  }
+}
+
 @utility input {
-  @apply w-full rounded-lg border border-borde bg-superficie px-3 py-2 text-sm outline-none focus:border-acento;
+  @apply w-full rounded-xl border border-borde bg-superficie px-3.5 py-2.5 text-sm transition outline-none placeholder:text-tenue/80 focus:border-acento focus:ring-4 focus:ring-acento/15;
 }
 @utility btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-60;
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60;
 }
 @utility btn-primario {
-  @apply btn bg-acento text-acento-texto hover:opacity-90;
+  @apply btn bg-acento text-acento-texto shadow-sm shadow-acento/25 hover:bg-acento-fuerte dark:hover:text-acento-texto;
 }
 @utility btn-secundario {
-  @apply btn border border-borde bg-superficie hover:bg-borde/50;
+  @apply btn border border-borde bg-superficie hover:border-acento/40 hover:bg-suave;
 }
 @utility btn-peligro {
   @apply btn border border-peligro/40 text-peligro hover:bg-peligro/10;
 }
 @utility tarjeta {
-  @apply rounded-xl border border-borde bg-superficie;
+  @apply rounded-2xl border border-borde bg-superficie shadow-[0_1px_2px_rgb(0_0_0/0.04)];
+}
+/* Tarjeta clickeable: se levanta un poco al pasar el mouse */
+@utility tarjeta-link {
+  @apply tarjeta transition duration-200 hover:-translate-y-0.5 hover:border-acento/50 hover:shadow-lg hover:shadow-acento/10;
 }
 @utility etiqueta {
-  @apply mb-1 block text-sm font-medium;
+  @apply mb-1.5 block text-sm font-medium;
 }

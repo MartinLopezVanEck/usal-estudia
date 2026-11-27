@@ -102,8 +102,8 @@ export default async function MateriaPage({
   };
 
   const pestana = (activo: boolean) =>
-    `flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm ${
-      activo ? "bg-acento/10 font-medium text-acento" : "hover:bg-borde/50"
+    `flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm transition ${
+      activo ? "bg-acento/10 font-semibold text-acento" : "text-tenue hover:bg-suave hover:text-texto"
     }`;
 
   return (
@@ -120,7 +120,7 @@ export default async function MateriaPage({
         ]}
       />
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <h1 className="text-2xl font-semibold">{materia.nombre}</h1>
+        <h1 className="text-3xl font-bold">{materia.nombre}</h1>
         <Link href={`/subir?materia=${materia.id}`} className="btn-secundario">
           Subir material de esta materia
         </Link>
@@ -154,7 +154,7 @@ export default async function MateriaPage({
               <Link
                 key={clave}
                 href={href({ orden: clave === "recientes" ? undefined : clave })}
-                className={`rounded-lg px-2.5 py-1 ${orden === clave ? "bg-acento/10 font-medium text-acento" : "hover:bg-borde/50"}`}
+                className={`rounded-lg px-2.5 py-1 transition ${orden === clave ? "bg-acento/10 font-semibold text-acento" : "text-tenue hover:bg-suave hover:text-texto"}`}
               >
                 {etiqueta}
               </Link>
@@ -164,7 +164,7 @@ export default async function MateriaPage({
             <div className="mb-3 flex flex-wrap gap-2">
               <Link
                 href={href({ tipo: undefined })}
-                className={`rounded-full border px-3 py-1 text-xs ${!tipo ? "border-acento text-acento" : "border-borde"}`}
+                className={`rounded-full border px-3 py-1 text-xs font-medium transition ${!tipo ? "border-acento bg-acento text-acento-texto" : "border-borde bg-superficie hover:border-acento/50"}`}
               >
                 Todos
               </Link>
@@ -172,7 +172,7 @@ export default async function MateriaPage({
                 <Link
                   key={t}
                   href={href({ tipo: t })}
-                  className={`rounded-full border px-3 py-1 text-xs ${tipo === t ? "border-acento text-acento" : "border-borde"}`}
+                  className={`rounded-full border px-3 py-1 text-xs font-medium transition ${tipo === t ? "border-acento bg-acento text-acento-texto" : "border-borde bg-superficie hover:border-acento/50"}`}
                 >
                   {TIPOS_MATERIAL[t as TipoMaterial]}
                 </Link>

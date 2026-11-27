@@ -17,7 +17,7 @@ export function BotonTema() {
     <button
       type="button"
       onClick={alternar}
-      className="rounded-lg p-2 text-tenue hover:bg-borde/50 hover:text-texto"
+      className="rounded-lg p-2 text-tenue transition hover:bg-suave hover:text-texto"
       aria-label="Cambiar entre modo claro y oscuro"
       title="Modo claro / oscuro"
     >

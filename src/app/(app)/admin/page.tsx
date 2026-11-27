@@ -40,7 +40,7 @@ export default async function AdminPendientesPage() {
   return (
     <div className="space-y-10">
       <section>
-        <h1 className="text-xl font-semibold">Archivos pendientes ({archivos.length})</h1>
+        <h1 className="text-xl font-bold">Archivos pendientes ({archivos.length})</h1>
         <p className="mt-1 text-sm text-tenue">
           Al aprobar un archivo también se aprueban la materia, el profesor y la carrera que se propusieron con él.
           Si el nombre propuesto está mal o es un duplicado, corregilo abajo antes de aprobar.
@@ -78,7 +78,7 @@ export default async function AdminPendientesPage() {
       </section>
 
       <section>
-        <h1 className="text-xl font-semibold">Propuestas ({totalPropuestas})</h1>
+        <h1 className="text-xl font-bold">Propuestas ({totalPropuestas})</h1>
         {totalPropuestas === 0 && (
           <p className="tarjeta mt-4 p-6 text-center text-sm text-tenue">No hay propuestas pendientes.</p>
         )}

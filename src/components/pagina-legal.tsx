@@ -14,7 +14,7 @@ export function PaginaLegal({
       <Link href="/" className="text-sm text-tenue hover:text-texto">
         ← Usal Estudia
       </Link>
-      <h1 className="mt-4 text-2xl font-semibold">{titulo}</h1>
+      <h1 className="mt-4 text-3xl font-bold">{titulo}</h1>
       <p className="mt-1 text-sm text-tenue">Última actualización: {actualizado}</p>
       <div className="mt-6 space-y-4 leading-relaxed [&_h2]:mt-8 [&_h2]:text-lg [&_h2]:font-semibold [&_ul]:list-disc [&_ul]:space-y-1 [&_ul]:pl-6">
         {children}

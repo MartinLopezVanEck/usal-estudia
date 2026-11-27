@@ -62,17 +62,17 @@ export function ListaArchivos({
   }
 
   return (
-    <ul className="tarjeta divide-y divide-borde">
+    <ul className="tarjeta divide-y divide-borde overflow-hidden">
       {archivos.map((a) => (
         <li key={a.id}>
-          <Link href={`/archivos/${a.id}`} className="flex items-start gap-3 p-4 hover:bg-borde/30">
-            <span className="mt-0.5 w-12 shrink-0 rounded bg-borde/60 py-1 text-center font-mono text-[10px] uppercase text-tenue">
+          <Link href={`/archivos/${a.id}`} className="group flex items-start gap-3.5 p-4 transition hover:bg-suave">
+            <span className="mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-acento/10 font-mono text-[10px] font-semibold uppercase text-acento">
               {extension(a.nombre_original) || "?"}
             </span>
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-medium">{a.titulo}</span>
-                <span className="rounded-full bg-acento/10 px-2 py-0.5 text-xs text-acento">
+                <span className="font-medium transition group-hover:text-acento">{a.titulo}</span>
+                <span className="rounded-full border border-borde px-2 py-0.5 text-xs text-tenue">
                   {TIPOS_MATERIAL[a.tipo]}
                 </span>
                 {mostrarEstado && <EstadoBadge estado={a.estado} />}

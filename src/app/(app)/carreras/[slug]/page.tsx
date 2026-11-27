@@ -38,7 +38,7 @@ export default async function CarreraPage({ params }: { params: Promise<{ slug: 
   return (
     <div>
       <Migas items={[{ label: carrera.nombre }]} />
-      <h1 className="text-2xl font-semibold">{carrera.nombre}</h1>
+      <h1 className="text-3xl font-bold">{carrera.nombre}</h1>
 
       {anios.length === 0 && (
         <p className="tarjeta mt-6 p-6 text-center text-sm text-tenue">
@@ -46,14 +46,20 @@ export default async function CarreraPage({ params }: { params: Promise<{ slug: 
         </p>
       )}
 
-      <div className="mt-6 space-y-8">
+      <div className="mt-8 space-y-10">
         {anios.map((anio) => (
           <section key={anio}>
-            <h2 className="mb-3 text-lg font-semibold">{anio}° Año</h2>
+            <h2 className="mb-4 flex items-center gap-3 text-lg font-bold">
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-acento text-sm text-acento-texto">
+                {anio}°
+              </span>
+              Año
+              <span aria-hidden className="h-px flex-1 bg-borde" />
+            </h2>
             <div className="grid gap-4 md:grid-cols-3">
               {ORDEN_CUATRI.filter((c) => porAnio.get(anio)!.has(c)).map((c) => (
                 <div key={c} className="tarjeta p-4">
-                  <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-tenue">
+                  <h3 className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-acento">
                     {CUATRIMESTRES[c]}
                   </h3>
                   <ul className="space-y-1">
@@ -65,7 +71,7 @@ export default async function CarreraPage({ params }: { params: Promise<{ slug: 
                         <li key={m.slug}>
                           <Link
                             href={`/materias/${m.slug}?carrera=${slug}`}
-                            className="block rounded-md px-2 py-1.5 hover:bg-borde/50"
+                            className="block rounded-lg px-2 py-1.5 text-sm transition hover:bg-acento/10 hover:text-acento"
                           >
                             {m.nombre}
                           </Link>

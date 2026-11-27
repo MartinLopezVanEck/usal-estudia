@@ -29,7 +29,7 @@ export function BotonGoogle({ next }: { next?: string }) {
           ingresar(next, true);
         }}
         disabled={cargando}
-        className="flex w-full items-center justify-center gap-3 rounded-lg border border-borde bg-fondo px-4 py-2.5 font-medium hover:bg-borde/40 disabled:opacity-60"
+        className="flex w-full items-center justify-center gap-3 rounded-xl border border-borde bg-superficie px-4 py-3 font-semibold shadow-sm transition hover:border-acento/40 hover:bg-suave active:scale-[0.98] disabled:opacity-60"
       >
         <svg viewBox="0 0 48 48" className="h-5 w-5" aria-hidden>
           <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z" />

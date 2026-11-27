@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { Buscador } from "@/components/buscador";
 import { BotonTema } from "@/components/boton-tema";
+import { Logo } from "@/components/logo";
 
 async function contarPendientes() {
   const db = createAdminClient();
@@ -23,31 +24,31 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-10 border-b border-borde bg-superficie/95 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b border-borde/80 bg-superficie/80 backdrop-blur-lg">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
-          <Link href="/" className="text-lg font-semibold">
-            Usal Estudia
+          <Link href="/" aria-label="Usal Estudia, inicio">
+            <Logo />
           </Link>
           <div className="order-last w-full sm:order-none sm:w-auto sm:flex-1">
             <Suspense>
               <Buscador />
             </Suspense>
           </div>
-          <nav className="ml-auto flex items-center gap-1 text-sm">
-            <Link href="/carreras" className="rounded-lg px-3 py-1.5 hover:bg-borde/50">
+          <nav className="ml-auto flex items-center gap-1 text-sm font-medium">
+            <Link href="/carreras" className="rounded-lg px-3 py-1.5 text-tenue transition hover:bg-suave hover:text-texto">
               Carreras
             </Link>
             <Link href="/subir" className="btn-primario px-3 py-1.5">
               Subir
             </Link>
-            <Link href="/mis-aportes" className="rounded-lg px-3 py-1.5 hover:bg-borde/50">
+            <Link href="/mis-aportes" className="rounded-lg px-3 py-1.5 text-tenue transition hover:bg-suave hover:text-texto">
               Mis aportes
             </Link>
             {esAdmin && (
-              <Link href="/admin" className="relative rounded-lg px-3 py-1.5 hover:bg-borde/50">
+              <Link href="/admin" className="relative rounded-lg px-3 py-1.5 text-tenue transition hover:bg-suave hover:text-texto">
                 Admin
                 {pendientes > 0 && (
-                  <span className="ml-1 rounded-full bg-aviso px-1.5 py-0.5 text-xs font-semibold text-white">
+                  <span className="ml-1 rounded-full bg-aviso px-1.5 py-0.5 text-xs font-semibold text-acento-texto">
                     {pendientes}
                   </span>
                 )}
@@ -56,7 +57,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <BotonTema />
             <form action="/auth/salir" method="post">
               <button
-                className="rounded-lg px-3 py-1.5 text-tenue hover:bg-borde/50"
+                className="rounded-lg px-3 py-1.5 text-tenue transition hover:bg-peligro/10 hover:text-peligro"
                 title={perfil.email}
               >
                 Salir
@@ -65,7 +66,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </nav>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
+      <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
     </div>
   );
 }

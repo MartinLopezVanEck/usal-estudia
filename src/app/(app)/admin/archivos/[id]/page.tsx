@@ -18,7 +18,7 @@ export default async function EditarArchivoPage({ params }: { params: Promise<{ 
 
   return (
     <form action={editarArchivo} className="tarjeta mx-auto max-w-2xl space-y-4 p-5">
-      <h1 className="text-xl font-semibold">Editar archivo</h1>
+      <h1 className="text-xl font-bold">Editar archivo</h1>
       <p className="font-mono text-xs text-tenue">{a.nombre_original}</p>
       <input type="hidden" name="id" value={a.id} />
 
